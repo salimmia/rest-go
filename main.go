@@ -3,6 +3,7 @@ package main
 import(
 	"net/http"
 	"github.com/gin-gonic/gin"
+	"fmt"
 )
 
 type todo struct{
@@ -21,10 +22,26 @@ func getTodos(context *gin.Context){
 	context.IndentedJSON(http.StatusOK, todos);
 }
 
+func addTodos(context *gin.Context) {
+	var newTodos todo
+
+	err := context.BindJSON(&newTodos)
+
+	if(err != nil){
+		return
+	}
+
+	todos = append(todos, newTodos)
+
+	context.IndentedJSON(http.StatusCreated, newTodos)
+}
+
 func main(){
-	router := gin.Default();
+	router := gin.Default()
 	
-	router.GET("/todos", getTodos);
+	router.GET("/todos", getTodos)
+
+	router.POST("/todos", addTodos)
 
 	router.Run("localhost:8080")
 }
